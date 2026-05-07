@@ -1,0 +1,121 @@
+services:
+  eureka-server:
+    build: ./eureka-server
+    container_name: eureka-server
+    ports:
+      - "8761:8761"
+
+  api-gateway:
+    build: ./api-gateway
+    container_name: api-gateway
+    ports:
+      - "8080:8080"
+    environment:
+      EUREKA_SERVER_URL: http://eureka-server:8761/eureka
+      JWT_SECRET: ${JWT_SECRET}
+      REDIS_HOST: ${REDIS_HOST}
+      REDIS_PORT: ${REDIS_PORT}
+      APP_CORS_ALLOWED_ORIGINS: ${APP_CORS_ALLOWED_ORIGINS}
+    depends_on:
+      - eureka-server
+
+  auth-service:
+    build: ./auth-service
+    container_name: auth-service
+    environment:
+      EUREKA_SERVER_URL: http://eureka-server:8761/eureka
+      JWT_SECRET: ${JWT_SECRET}
+      DB_HOST: ${DB_HOST}
+      DB_NAME: auth_db
+      DB_USERNAME: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
+      KAFKA_BOOTSTRAP_SERVERS: ${KAFKA_BOOTSTRAP_SERVERS}
+      REDIS_HOST: ${REDIS_HOST}
+      REDIS_PORT: ${REDIS_PORT}
+      APP_BASE_URL: ${APP_BASE_URL}
+    depends_on:
+      - eureka-server
+
+  household-service:
+    build: ./household-service
+    container_name: household-service
+    environment:
+      EUREKA_SERVER_URL: http://eureka-server:8761/eureka
+      DB_HOST: ${DB_HOST}
+      DB_NAME: household_db
+      DB_USERNAME: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
+      KAFKA_BOOTSTRAP_SERVERS: ${KAFKA_BOOTSTRAP_SERVERS}
+    depends_on:
+      - eureka-server
+
+  expense-service:
+    build: ./expense-service
+    container_name: expense-service
+    environment:
+      EUREKA_SERVER_URL: http://eureka-server:8761/eureka
+      DB_HOST: ${DB_HOST}
+      DB_NAME: expense_db
+      DB_USERNAME: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
+      KAFKA_BOOTSTRAP_SERVERS: ${KAFKA_BOOTSTRAP_SERVERS}
+      REDIS_HOST: ${REDIS_HOST}
+      REDIS_PORT: ${REDIS_PORT}
+    depends_on:
+      - eureka-server
+
+  settlement-service:
+    build: ./settlement-service
+    container_name: settlement-service
+    environment:
+      EUREKA_SERVER_URL: http://eureka-server:8761/eureka
+      DB_HOST: ${DB_HOST}
+      DB_NAME: settlement_db
+      DB_USERNAME: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
+      KAFKA_BOOTSTRAP_SERVERS: ${KAFKA_BOOTSTRAP_SERVERS}
+    depends_on:
+      - eureka-server
+
+  ai-service:
+    build: ./ai-service
+    container_name: ai-service
+    environment:
+      EUREKA_SERVER_URL: http://eureka-server:8761/eureka
+      KAFKA_BOOTSTRAP_SERVERS: ${KAFKA_BOOTSTRAP_SERVERS}
+      GOOGLE_GENAI_API_KEY: ${GOOGLE_GENAI_API_KEY}
+    depends_on:
+      - eureka-server
+
+  notification-service:
+    build: ./notification-service
+    container_name: notification-service
+    environment:
+      EUREKA_SERVER_URL: http://eureka-server:8761/eureka
+      KAFKA_BOOTSTRAP_SERVERS: ${KAFKA_BOOTSTRAP_SERVERS}
+    depends_on:
+      - eureka-server
+
+  email-service:
+    build: ./email-service
+    container_name: email-service
+    environment:
+      EUREKA_SERVER_URL: http://eureka-server:8761/eureka
+      DB_URL: jdbc:mysql://${DB_HOST}:3306/email_db
+      DB_USERNAME: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
+      KAFKA_BOOTSTRAP_SERVERS: ${KAFKA_BOOTSTRAP_SERVERS}
+      MAIL_USERNAME: ${MAIL_USERNAME}
+      MAIL_PASSWORD: ${MAIL_PASSWORD}
+      MAIL_FROM_EMAIL: ${MAIL_FROM_EMAIL}
+      MAIL_HOST: ${MAIL_HOST}
+    depends_on:
+      - eureka-server
+
+  frontend:
+    build: ./frontend
+    container_name: frontend
+    ports:
+      - "5173:80"
+    depends_on:
+      - api-gateway
