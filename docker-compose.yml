@@ -65,7 +65,9 @@ services:
       - redis
 
   auth-service:
-    build: ./auth-service
+    build:
+      context: .
+      dockerfile: auth-service/Dockerfile
     container_name: auth-service
     environment:
       EUREKA_SERVER_URL: http://eureka-server:8761/eureka
