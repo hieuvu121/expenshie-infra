@@ -109,7 +109,9 @@ services:
         condition: service_started
 
   expense-service:
-    build: ./expense-service
+    build:
+      context: .
+      dockerfile: expense-service/Dockerfile
     container_name: expense-service
     environment:
       EUREKA_SERVER_URL: http://eureka-server:8761/eureka
