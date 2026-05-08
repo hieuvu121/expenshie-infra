@@ -89,7 +89,9 @@ services:
         condition: service_started
 
   household-service:
-    build: ./household-service
+    build:
+      context: .
+      dockerfile: household-service/Dockerfile
     container_name: household-service
     environment:
       EUREKA_SERVER_URL: http://eureka-server:8761/eureka
